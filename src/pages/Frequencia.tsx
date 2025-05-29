@@ -124,8 +124,12 @@ export default function Frequencia(): JSX.Element {
           presMap[ddata.alunoId] = ddata.presenca;
         });
         const initial: Record<string, boolean> = {};
-        listaAlunos.forEach(a => { initial[a.id] = !!presMap[a.id]; });
+        listaAlunos.forEach(a => {
+          // Se houver registro anterior, usa ele. Caso contrário, marca como presente
+          initial[a.id] = presMap[a.id] !== undefined ? presMap[a.id] : true;
+        });
         setAttendance(initial);
+
       } catch (err) {
         console.error('Erro ao buscar dados de frequência:', err);
       }
@@ -182,26 +186,61 @@ export default function Frequencia(): JSX.Element {
             <h3 className="text-primary">Lançar Frequência</h3>
           </Col>
           <Col xs={12} md={8} className="d-flex gap-2">
-            <Form.Select value={turmaId} onChange={e => {
-              setTurmaId(e.target.value);
-              setMateriaId('');
-            }}>
+            <Form.Select
+              value={turmaId}
+              onChange={e => {
+                setTurmaId(e.target.value);
+                setMateriaId('');
+              }}
+            >
               <option value="">Selecione a Turma</option>
-              {turmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
+              {turmas.map(t => (
+                <option key={t.id} value={t.id}>
+                  {t.nome}
+                </option>
+              ))}
             </Form.Select>
-            <Form.Select value={materiaId} onChange={e => setMateriaId(e.target.value)} disabled={!turmaId}>
+            <Form.Select
+              value={materiaId}
+              onChange={e => setMateriaId(e.target.value)}
+              disabled={!turmaId}
+            >
               <option value="">Selecione a Matéria</option>
-              {vinculos
-                .filter(v => v.turmaId === turmaId)
-                .map(v => {
-                  const materia = materias.find(m => m.id === v.materiaId);
-                  return materia ? (
-                    <option key={materia.id} value={materia.id}>{materia.nome}</option>
-                  ) : null;
-                })}
+              {isAdmin
+                ? materias
+                    .filter(m => m && m.nome)
+                    .map(m => (
+                      <option key={m.id} value={m.id}>
+                        {m.nome}
+                      </option>
+                    ))
+                : vinculos
+                    .filter(v => v.turmaId === turmaId)
+                    .map(v => {
+                      const materia = materias.find(m => m.id === v.materiaId);
+                      return materia ? (
+                        <option key={materia.id} value={materia.id}>
+                          {materia.nome}
+                        </option>
+                      ) : null;
+                    })}
             </Form.Select>
-            <Form.Control id="data-aula" type="date" value={dataAula} onChange={e => setDataAula(e.target.value)} />
-            <Button variant="primary" onClick={handleSalvar} disabled={saving || loading || !alunos.length || Object.keys(attendance).length === 0}>
+            <Form.Control
+              id="data-aula"
+              type="date"
+              value={dataAula}
+              onChange={e => setDataAula(e.target.value)}
+            />
+            <Button
+              variant="primary"
+              onClick={handleSalvar}
+              disabled={
+                saving ||
+                loading ||
+                !alunos.length ||
+                Object.keys(attendance).length === 0
+              }
+            >
               {saving ? <Spinner animation="border" size="sm" /> : 'Salvar'}
             </Button>
           </Col>
@@ -211,13 +250,27 @@ export default function Frequencia(): JSX.Element {
           <>
             <Row className="mb-2">
               <Col className="d-flex gap-2">
-                <Button variant="success" size="sm" onClick={marcarTodosComoPresente}>Todos Presentes</Button>
-                <Button variant="danger" size="sm" onClick={marcarTodosComoAusente}>Todos Ausentes</Button>
+                <Button
+                  variant="success"
+                  size="sm"
+                  onClick={marcarTodosComoPresente}
+                >
+                  Todos Presentes
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={marcarTodosComoAusente}
+                >
+                  Todos Ausentes
+                </Button>
               </Col>
             </Row>
             <Row className="mb-3">
               <Col>
-                <p>Presentes: {Object.values(attendance).filter(v => v).length} | Ausentes: {Object.values(attendance).filter(v => !v).length}</p>
+                <p>
+                  Presentes: {Object.values(attendance).filter(v => v).length} | Ausentes: {Object.values(attendance).filter(v => !v).length}
+                </p>
               </Col>
             </Row>
           </>
@@ -240,7 +293,11 @@ export default function Frequencia(): JSX.Element {
                 {alunos.map(a => (
                   <tr
                     key={a.id}
-                    style={{ backgroundColor: attendance[a.id] ? '#d4edda' : '#f8d7da' }}
+                    style={{
+                      backgroundColor: attendance[a.id]
+                        ? '#d4edda'
+                        : '#f8d7da',
+                    }}
                   >
                     <td>{a.nome}</td>
                     <td className="text-center">
@@ -269,7 +326,13 @@ export default function Frequencia(): JSX.Element {
         )}
 
         <ToastContainer position="bottom-end" className="p-3">
-          <Toast show={toast.show} bg={toast.variant} onClose={() => setToast(prev => ({ ...prev, show: false }))} delay={3000} autohide>
+          <Toast
+            show={toast.show}
+            bg={toast.variant}
+            onClose={() => setToast(prev => ({ ...prev, show: false }))}
+            delay={3000}
+            autohide
+          >
             <Toast.Body className="text-white">{toast.message}</Toast.Body>
           </Toast>
         </ToastContainer>

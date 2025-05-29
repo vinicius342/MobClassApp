@@ -193,7 +193,10 @@ export default function Notas(): JSX.Element {
     setSaving(true);
     try {
       for (const [uid, data] of Object.entries(notasEdit)) {
-        if ([data.notaParcial, data.notaGlobal, data.notaParticipacao].some(val => val.trim() !== '')) {
+        const hasAnyNota = [data.notaParcial, data.notaGlobal, data.notaParticipacao]
+          .some(val => typeof val === 'string' && val.trim() !== '');
+
+        if (hasAnyNota) {
           await saveRecord(uid, data);
         }
       }
