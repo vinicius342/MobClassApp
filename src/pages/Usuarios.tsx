@@ -11,10 +11,11 @@ import { db } from '../services/firebase';
 import {
   collection, getDocs, updateDoc, deleteDoc, doc
 } from 'firebase/firestore';
-import UsuarioForm, { FormValues, Turma, AlunoOption } from '../components/UsuarioForm';
+import UsuarioForm, { FormValues, AlunoOption } from '../components/UsuarioForm';
 
 interface UsuarioBase { id: string; nome: string; email: string; status: 'Ativo' | 'Inativo'; }
 interface Professor extends UsuarioBase { turmas: string[]; }
+interface Turma { id: string; nome: string; }
 interface Aluno extends UsuarioBase { turmaId?: string; responsavelId?: string; }
 interface Responsavel extends UsuarioBase { filhos?: string[]; }
 interface Administrador extends UsuarioBase { }
@@ -52,11 +53,21 @@ export default function Usuarios(): JSX.Element {
       const alunosList = aSnap.docs.map(d => ({ id: d.id, ...(d.data() as any) }));
       setProfessores(pSnap.docs.map(d => ({ id: d.id, ...(d.data() as any) })));
       setAlunos(alunosList);
-      setAlunosOptions(alunosList.map(a => ({ id: a.id, nome: a.nome })));
       setResponsaveis(rSnap.docs.map(d => ({ id: d.id, ...(d.data() as any) })));
       setAdministradores(admSnap.docs.map(d => ({ id: d.id, ...(d.data() as any) })));
       setTurmas(tSnap.docs.map(d => ({ id: d.id, nome: (d.data() as any).nome })));
       setLoading(false);
+      setAlunosOptions(
+        alunosList
+          .map(a => {
+            const turma = tSnap.docs.find(t => t.id === a.turmaId);
+            return {
+              id: a.id,
+              nome: `${a.nome}${turma ? ` - ${(turma.data() as any).nome}` : ''}`,
+            };
+          })
+          .sort((a, b) => a.nome.localeCompare(b.nome))
+      );
     }
     fetchData();
   }, []);
@@ -142,7 +153,13 @@ export default function Usuarios(): JSX.Element {
       if (data.tipoUsuario === 'professores') setProfessores(novosDados);
       if (data.tipoUsuario === 'alunos') {
         setAlunos(novosDados);
-        setAlunosOptions(novosDados.map(a => ({ id: a.id, nome: a.nome })));
+        setAlunosOptions(novosDados.map(a => {
+          const turma = turmas.find(t => t.id === a.turmaId);
+          return {
+            id: a.id,
+            nome: `${a.nome}${turma ? ` (${turma.nome})` : ''}`,
+          };
+        }));
       }
       if (data.tipoUsuario === 'responsaveis') setResponsaveis(novosDados);
       if (data.tipoUsuario === 'administradores') setAdministradores(novosDados);
@@ -230,20 +247,20 @@ export default function Usuarios(): JSX.Element {
               <FormControl placeholder="Pesquisar..." value={search} onChange={handleSearch} />
             </InputGroup>
           </Col>
-            <Col md={6}>
-              <Form.Select
+          <Col md={6}>
+            <Form.Select
               value={turmaFiltro}
               onChange={e => setTurmaFiltro(e.target.value)}
               disabled={!(activeTab === 'alunos' && usuarioLogado.tipo === 'administradores')}
-              >
+            >
               <option value="">Todas as turmas</option>
               {[...turmas]
                 .sort((a, b) => a.nome.localeCompare(b.nome))
                 .map(t => (
-                <option key={t.id} value={t.id}>{t.nome}</option>
+                  <option key={t.id} value={t.id}>{t.nome}</option>
                 ))}
-              </Form.Select>
-            </Col>
+            </Form.Select>
+          </Col>
         </Row>
 
         <Tabs activeKey={activeTab} onSelect={k => { setActiveTab(k as any); setCurrentPage(1); }} className="mb-3">
@@ -259,64 +276,64 @@ export default function Usuarios(): JSX.Element {
           <>
             <Table bordered hover responsive>
               <thead>
-          <tr>
-            <th>Nome</th>
-            <th>E-mail</th>
-            <th>Status</th>
-            <th>{activeTab === 'professores' ? 'Turmas' : activeTab === 'alunos' ? 'Turma' : activeTab === 'responsaveis' ? 'Filhos' : '-'}</th>
-            <th>Ações</th>
-          </tr>
+                <tr>
+                  <th>Nome</th>
+                  <th>E-mail</th>
+                  <th>Status</th>
+                  <th>{activeTab === 'professores' ? 'Turmas' : activeTab === 'alunos' ? 'Turma' : activeTab === 'responsaveis' ? 'Filhos' : '-'}</th>
+                  <th>Ações</th>
+                </tr>
               </thead>
               <tbody>
-          {activeTab === 'alunos' && turmaFiltro
-            ? filterList(alunos)
-                .filter(a => a.turmaId === turmaFiltro)
-                .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-                .map(user => (
-            <tr key={user.id}>
-              <td>{user.nome}</td>
-              <td>{user.email}</td>
-              <td>
-                <Badge bg={user.status === 'Ativo' ? 'success' : 'secondary'}>
-                  {user.status}
-                </Badge>
-              </td>
-              <td>{turmas.find(t => t.id === user.turmaId)?.nome}</td>
-              <td>
-                <Dropdown align="end">
-                  <Dropdown.Toggle variant="light" size="sm">
-              <i className="bi bi-three-dots-vertical"></i>
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-              <Dropdown.Item onClick={() => openEdit(user)}>
-                <i className="bi bi-pencil me-2"></i> Editar
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => handleExcluir(user.id)}>
-                <i className="bi bi-trash me-2"></i> Excluir
-              </Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </td>
-            </tr>
-                ))
-            : renderRows()}
+                {activeTab === 'alunos' && turmaFiltro
+                  ? filterList(alunos)
+                    .filter(a => a.turmaId === turmaFiltro)
+                    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                    .map(user => (
+                      <tr key={user.id}>
+                        <td>{user.nome}</td>
+                        <td>{user.email}</td>
+                        <td>
+                          <Badge bg={user.status === 'Ativo' ? 'success' : 'secondary'}>
+                            {user.status}
+                          </Badge>
+                        </td>
+                        <td>{turmas.find(t => t.id === user.turmaId)?.nome}</td>
+                        <td>
+                          <Dropdown align="end">
+                            <Dropdown.Toggle variant="light" size="sm">
+                              <i className="bi bi-three-dots-vertical"></i>
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                              <Dropdown.Item onClick={() => openEdit(user)}>
+                                <i className="bi bi-pencil me-2"></i> Editar
+                              </Dropdown.Item>
+                              <Dropdown.Item onClick={() => handleExcluir(user.id)}>
+                                <i className="bi bi-trash me-2"></i> Excluir
+                              </Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </td>
+                      </tr>
+                    ))
+                  : renderRows()}
               </tbody>
             </Table>
             <Paginacao
               paginaAtual={currentPage}
               totalPaginas={Math.ceil(
-          (activeTab === 'alunos' && turmaFiltro
-            ? filterList(alunos).filter(a => a.turmaId === turmaFiltro)
-            : filterList(
-                activeTab === 'professores'
-            ? professores
-            : activeTab === 'alunos'
-            ? alunos
-            : activeTab === 'responsaveis'
-            ? responsaveis
-            : administradores
-              )
-          ).length / itemsPerPage
+                (activeTab === 'alunos' && turmaFiltro
+                  ? filterList(alunos).filter(a => a.turmaId === turmaFiltro)
+                  : filterList(
+                    activeTab === 'professores'
+                      ? professores
+                      : activeTab === 'alunos'
+                        ? alunos
+                        : activeTab === 'responsaveis'
+                          ? responsaveis
+                          : administradores
+                  )
+                ).length / itemsPerPage
               )}
               aoMudarPagina={setCurrentPage}
             />
