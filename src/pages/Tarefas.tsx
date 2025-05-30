@@ -357,12 +357,16 @@ export default function Tarefas() {
                     <Form.Select
                       value={busca}
                       onChange={e => setBusca(e.target.value)}
-                      disabled={!filtroMateria}
+                      disabled={!filtroMateria || !filtroTurma}
                     >
                       <option value="">Selecione uma atividade</option>
                       {[...new Set(
                         tarefas
-                          .filter(t => !filtroMateria || t.materiaId === filtroMateria)
+                          .filter(
+                            t =>
+                              (!filtroMateria || t.materiaId === filtroMateria) &&
+                              (!filtroTurma || t.turmaId === filtroTurma)
+                          )
                           .map(t => t.descricao)
                       )]
                         .sort()
@@ -589,9 +593,11 @@ export default function Tarefas() {
                         <Form.Label>Turma</Form.Label>
                         <Form.Select value={turmaId} onChange={e => setTurmaId(e.target.value)}>
                           <option value="">Selecione a turma</option>
-                          {turmas.map(t => (
-                            <option key={t.id} value={t.id}>{t.nome}</option>
-                          ))}
+                          {[...turmas]
+                            .sort((a, b) => a.nome.localeCompare(b.nome))
+                            .map(t => (
+                              <option key={t.id} value={t.id}>{t.nome}</option>
+                            ))}
                         </Form.Select>
                       </Form.Group>
                       <Form.Group className="mb-3">
