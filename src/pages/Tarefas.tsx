@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import {
-  Container, Row, Col, Card, Button, Modal, Form, Table, Spinner} from 'react-bootstrap';
+  Container, Row, Col, Card, Button, Modal, Form, Table, Spinner
+} from 'react-bootstrap';
 import {
   collection, addDoc, getDocs, doc, updateDoc, query, where, getDoc
 } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import AppLayout from '../components/AppLayout';
-// TODO Resolver depois
+// TODO: Resolver depois
 // import { PlusCircle } from 'react-bootstrap-icons';
 import { useAuth } from '../contexts/AuthContext';
 import Paginacao from '../components/Paginacao';
@@ -16,6 +17,13 @@ import Paginacao from '../components/Paginacao';
 import { GraduationCap, Plus, Eye } from "lucide-react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faX, faCircleExclamation, faCheck, faComment } from '@fortawesome/free-solid-svg-icons';
+
+//PDF
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+// XLSX
+import * as XLSX from 'xlsx';
 
 interface Entrega {
   id: string;
@@ -77,6 +85,7 @@ export default function Tarefas() {
 
   const [showModal, setShowModal] = useState(false);
   const [materiaSelecionada, setMateriaSelecionada] = useState('');
+  const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
   const [turmaId, setTurmaId] = useState('');
   const [dataEntrega, setDataEntrega] = useState('');
@@ -93,6 +102,65 @@ export default function Tarefas() {
     alunoId: string | null;
     texto: string;
   }>({ alunoId: null, texto: "" });
+
+  const exportarPDF = () => {
+    const tarefaSelecionada = tarefas.find(t => t.descricao === busca && t.materiaId === filtroMateria);
+    if (!tarefaSelecionada) return;
+
+    const doc = new jsPDF();
+    doc.text("Relatório de Acompanhamento de Tarefas", 14, 15);
+
+    autoTable(doc, {
+      startY: 20,
+      head: [['Aluno', 'Status', 'Data Conclusão', 'Anexo']],
+      body: alunosFiltrados.map(aluno => {
+        const entrega = entregas.find(e => e.alunoId === aluno.id && e.tarefaId === tarefaSelecionada.id);
+        return [
+          aluno.nome,
+          entrega?.status ?? 'Não entregue',
+          entrega?.dataConclusao ?? '-',
+          entrega?.anexoUrl ? 'Sim' : 'Não'
+        ];
+      })
+    });
+
+    doc.save(`acompanhamento_${busca}.pdf`);
+  };
+
+  const exportarExcel = () => {
+    const tarefaSelecionada = tarefas.find(t => t.descricao === busca && t.materiaId === filtroMateria);
+    if (!tarefaSelecionada) return;
+
+    const data = alunosFiltrados.map(aluno => {
+      const entrega = entregas.find(e => e.alunoId === aluno.id && e.tarefaId === tarefaSelecionada.id);
+      return {
+        Aluno: aluno.nome,
+        Status: entrega?.status ?? 'Não entregue',
+        'Data de Conclusão': entrega?.dataConclusao ?? '-',
+        Anexo: entrega?.anexoUrl ? 'Sim' : 'Não'
+      };
+    });
+
+    // Cria a planilha
+    const worksheet = XLSX.utils.json_to_sheet(data);
+
+    // Define a largura das colunas (opcional)
+    worksheet['!cols'] = [
+      { wch: 35 }, // Aluno
+      { wch: 15 }, // Status
+      { wch: 20 }, // Data de Conclusão
+      { wch: 10 }  // Anexo
+    ];
+
+    // Cria o workbook e adiciona a aba
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Acompanhamento');
+
+    // Salva o arquivo
+    XLSX.writeFile(workbook, `acompanhamento_${busca}.xlsx`);
+  };
+
+
 
 
   useEffect(() => {
@@ -220,7 +288,7 @@ export default function Tarefas() {
   const handleSalvar = async () => {
     if (!materiaSelecionada || !descricao || !turmaId || !dataEntrega) return;
     if (!userData) return;
-    const payload = { materiaId: materiaSelecionada, descricao, turmaId, dataEntrega, professorId: userData.uid };
+    const payload = { materiaId: materiaSelecionada, titulo, descricao, turmaId, dataEntrega, professorId: userData.uid };
     if (editandoId) {
       await updateDoc(doc(db, 'tarefas', editandoId), payload);
     } else {
@@ -324,6 +392,10 @@ export default function Tarefas() {
                 <Row className="justify-content-between align-items-center mb-3">
                   <Col>
                     <h3 className="text-primary">Acompanhamento de Atividades</h3>
+                  </Col>
+                  <Col className="d-flex justify-content-end gap-2 mb-3">
+                    <Button variant="outline-primary" onClick={exportarPDF}>Exportar PDF</Button>
+                    <Button variant="outline-success" onClick={exportarExcel}>Exportar Excel</Button>
                   </Col>
                 </Row>
 
@@ -430,7 +502,7 @@ export default function Tarefas() {
                                         })()}
                                       </td>
                                       <td style={{ whiteSpace: 'nowrap', maxWidth: 300, overflowX: 'auto' }}>{aluno.nome}</td>
-                                      <td>{entrega?.dataConclusao ?? '-'}</td>
+                                      <td className="text-center">{entrega?.dataConclusao ?? '-'}</td>
                                       <td>
                                         {entrega?.anexoUrl ? (
                                           <a
@@ -445,17 +517,17 @@ export default function Tarefas() {
                                           <span style={{ color: "rgb(33 37 41 / 75%)" }}>Sem anexo</span>
                                         )}
                                       </td>
-                                        <td className="text-center">
-                                          <FontAwesomeIcon
-                                            icon={faComment}
-                                            size="lg"
-                                            style={{
-                                              color: entrega?.observacoes && entrega.observacoes.trim() !== "" ? "#FFD43B" : "#212529",
-                                              cursor: "pointer"
-                                            }}
-                                            onClick={() => abrirObservacao(aluno.id, entrega?.observacoes ?? "")}
-                                          />
-                                        </td>
+                                      <td className="text-center">
+                                        <FontAwesomeIcon
+                                          icon={faComment}
+                                          size="lg"
+                                          style={{
+                                            color: entrega?.observacoes && entrega.observacoes.trim() !== "" ? "#FFD43B" : "#212529",
+                                            cursor: "pointer"
+                                          }}
+                                          onClick={() => abrirObservacao(aluno.id, entrega?.observacoes ?? "")}
+                                        />
+                                      </td>
                                       <td className="d-flex flex-column gap-2" style={{ whiteSpace: 'nowrap' }}>
                                         <div className="d-flex gap-2">
                                           <Button variant="success" size="sm" onClick={() => atualizarEntrega(aluno.id, 'concluida')}>Confirmar</Button>
@@ -585,12 +657,14 @@ export default function Tarefas() {
                 </Button>
                 <Modal show={showModal} onHide={handleClose} centered>
                   <Modal.Header closeButton>
-                    <Modal.Title>{editandoId ? 'Editar Tarefa' : 'Nova Tarefa'}</Modal.Title>
+                    <Modal.Title>
+                      <h3 className="text-dark mb-0">{editandoId ? 'Editar Tarefa' : '+ Cadastro de Atividade'}</h3>
+                    </Modal.Title>
                   </Modal.Header>
                   <Modal.Body>
                     <Form>
                       <Form.Group className="mb-3">
-                        <Form.Label>Turma</Form.Label>
+                        <Form.Label>Turma *</Form.Label>
                         <Form.Select value={turmaId} onChange={e => setTurmaId(e.target.value)}>
                           <option value="">Selecione a turma</option>
                           {[...turmas]
@@ -601,7 +675,7 @@ export default function Tarefas() {
                         </Form.Select>
                       </Form.Group>
                       <Form.Group className="mb-3">
-                        <Form.Label>Matéria</Form.Label>
+                        <Form.Label>Matéria/Disciplina *</Form.Label>
                         <Form.Select
                           value={materiaSelecionada}
                           onChange={e => setMateriaSelecionada(e.target.value)}
@@ -619,7 +693,16 @@ export default function Tarefas() {
                         </Form.Select>
                       </Form.Group>
                       <Form.Group className="mb-3">
-                        <Form.Label>Descrição</Form.Label>
+                        <Form.Label>Título da Atividade *</Form.Label>
+                        <Form.Control
+                          type="text"
+                          value={titulo}
+                          onChange={e => setTitulo(e.target.value)}
+                          placeholder="Digite o título da atividade"
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Descrição da Atividade *</Form.Label>
                         <Form.Control
                           as="textarea"
                           rows={2}
@@ -628,7 +711,7 @@ export default function Tarefas() {
                         />
                       </Form.Group>
                       <Form.Group className="mb-3">
-                        <Form.Label>Data de Entrega</Form.Label>
+                        <Form.Label>Data de Entrega *</Form.Label>
                         <Form.Control
                           type="date"
                           value={dataEntrega}
@@ -648,7 +731,7 @@ export default function Tarefas() {
         </div>
       </Container>
     </AppLayout>
-  );
+  );
 }
 
 
