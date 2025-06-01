@@ -10,6 +10,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import { Link2 } from 'lucide-react';
 
 interface Professor { id: string; nome: string; }
 interface Turma { id: string; nome: string; }
@@ -136,9 +137,26 @@ export default function Vinculos() {
     <AppLayout>
       <Container className="my-4">
         <Row className="mb-3 justify-content-between">
-          <Col>
-            <h3 className="text-primary">Vínculos Professor-Matéria</h3>
-          </Col>
+          <div className="bg-white border-bottom border-gray-200 mb-4">
+            <div className="container px-4">
+              <div className="d-flex align-items-center justify-content-between py-4">
+                <div className="d-flex align-items-center gap-3">
+                  <div
+                    className="d-flex align-items-center justify-content-center rounded bg-primary"
+                    style={{ width: 48, height: 48 }}
+                  >
+                    <Link2 size={24} color="#fff" />
+                  </div>
+                  <div>
+                    <h2 className="fs-3 fw-bold text-dark mb-0">Vínculos Professor-Matéria</h2>
+                    <p className="text-muted mb-0" style={{ fontSize: 14 }}>
+                      MobClassApp - Portal do Professor
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <Col className="text-end">
             <Button onClick={() => setShowModal(true)}>Novo Vínculo</Button>
           </Col>

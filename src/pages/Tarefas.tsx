@@ -352,7 +352,7 @@ export default function Tarefas() {
                     <GraduationCap size={24} color="#fff" />
                   </div>
                   <div>
-                    <h1 className="fs-3 fw-bold text-dark mb-0">Gerenciamento de Tarefas</h1>
+                    <h2 className="fs-3 fw-bold text-dark mb-0">Gerenciamento de Tarefas</h2>
                     <p className="text-muted mb-0" style={{ fontSize: 14 }}>MobClassApp - Portal do Professor</p>
                   </div>
                 </div>
