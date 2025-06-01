@@ -154,12 +154,12 @@ export default function Vinculos() {
                     </p>
                   </div>
                 </div>
+                <Col className="text-end">
+                  <Button onClick={() => setShowModal(true)}>Novo Vínculo</Button>
+                </Col>
               </div>
             </div>
           </div>
-          <Col className="text-end">
-            <Button onClick={() => setShowModal(true)}>Novo Vínculo</Button>
-          </Col>
         </Row>
 
         <Row className="mb-3">
