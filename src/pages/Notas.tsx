@@ -130,12 +130,12 @@ export default function Notas(): JSX.Element {
       );
       newEdit[a.uid] = existing
         ? {
-            id: existing.id,
-            notaParcial: existing.notaParcial?.toString() ?? '',
-            notaGlobal: existing.notaGlobal?.toString() ?? '',
-            notaParticipacao: existing.notaParticipacao?.toString() ?? '',
-            notaRecuperacao: existing.notaRecuperacao?.toString() ?? ''
-          }
+          id: existing.id,
+          notaParcial: existing.notaParcial?.toString() ?? '',
+          notaGlobal: existing.notaGlobal?.toString() ?? '',
+          notaParticipacao: existing.notaParticipacao?.toString() ?? '',
+          notaRecuperacao: existing.notaRecuperacao?.toString() ?? ''
+        }
         : { notaParcial: '', notaGlobal: '', notaParticipacao: '', notaRecuperacao: '' };
     });
     setNotasEdit(newEdit);
@@ -215,6 +215,26 @@ export default function Notas(): JSX.Element {
   return (
     <AppLayout>
       <Container className="my-4">
+        <div className="bg-white border-bottom border-gray-200 mb-4">
+          <div className="container px-4">
+            <div className="d-flex align-items-center justify-content-between py-4">
+              <div className="d-flex align-items-center gap-3">
+                <div
+                  className="d-flex align-items-center justify-content-center rounded bg-primary text-white fw-bold"
+                  style={{ width: 48, height: 48, fontSize: 20 }}
+                >
+                  10
+                </div>
+                <div>
+                  <h2 className="fs-3 fw-bold text-dark mb-0">Notas</h2>
+                  <p className="text-muted mb-0" style={{ fontSize: 14 }}>
+                    MobClassApp - Portal do Professor
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <Tabs activeKey={abaAtiva} onSelect={(k) => setAbaAtiva(k as any)} className="mb-3">
           {/* ...aba Lançamento permanece igual... */}
           <Tab eventKey="lancamento" title="Lançamento de Notas">

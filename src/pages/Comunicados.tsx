@@ -11,6 +11,7 @@ import {
 import { db } from '../services/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import Paginacao from '../components/Paginacao';
+import { Megaphone } from 'react-bootstrap-icons';
 
 interface Comunicado {
   id: string;
@@ -158,9 +159,26 @@ export default function Comunicados() {
     <AppLayout>
       <Container className="my-4">
         <Row className="mb-3 justify-content-between">
-          <Col>
-            <h3 className="text-primary">Comunicados</h3>
-          </Col>
+          <div className="bg-white border-bottom border-gray-200 mb-4">
+            <div className="container px-4">
+              <div className="d-flex align-items-center justify-content-between py-4">
+                <div className="d-flex align-items-center gap-3">
+                  <div
+                    className="d-flex align-items-center justify-content-center rounded bg-primary"
+                    style={{ width: 48, height: 48 }}
+                  >
+                    <Megaphone size={24} color="#fff" />
+                  </div>
+                  <div>
+                    <h2 className="fs-3 fw-bold text-dark mb-0">Comunicados</h2>
+                    <p className="text-muted mb-0" style={{ fontSize: 14 }}>
+                      MobClassApp - Portal do Professor
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <Col md={6}>
             <InputGroup>
               <FormControl
@@ -273,7 +291,6 @@ export default function Comunicados() {
     </AppLayout>
   );
 }
-
 
 
 

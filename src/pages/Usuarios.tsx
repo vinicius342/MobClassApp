@@ -3,21 +3,22 @@ import { useEffect, useState, ChangeEvent, JSX } from 'react';
 import AppLayout from '../components/AppLayout';
 import {
   Container, Row, Col, Button, Table, Tabs, Tab, Badge, Spinner,
-  Modal, InputGroup, FormControl, Toast, ToastContainer, Dropdown
+  Modal, InputGroup, FormControl, Toast, ToastContainer, Dropdown, Form
 } from 'react-bootstrap';
-import { PlusCircle } from 'react-bootstrap-icons';
+import { PlusCircle, Person } from 'react-bootstrap-icons';
 import Paginacao from '../components/Paginacao';
 import { db } from '../services/firebase';
 import {
   collection, getDocs, updateDoc, deleteDoc, doc
 } from 'firebase/firestore';
-import UsuarioForm, { FormValues, Turma, AlunoOption } from '../components/UsuarioForm';
+import UsuarioForm, { FormValues, AlunoOption } from '../components/UsuarioForm';
 
 interface UsuarioBase { id: string; nome: string; email: string; status: 'Ativo' | 'Inativo'; }
 interface Professor extends UsuarioBase { turmas: string[]; }
+interface Turma { id: string; nome: string; }
 interface Aluno extends UsuarioBase { turmaId?: string; responsavelId?: string; }
 interface Responsavel extends UsuarioBase { filhos?: string[]; }
-interface Administrador extends UsuarioBase {}
+interface Administrador extends UsuarioBase { }
 
 export default function Usuarios(): JSX.Element {
   const [activeTab, setActiveTab] = useState<'professores' | 'alunos' | 'responsaveis' | 'administradores'>('professores');
@@ -30,6 +31,7 @@ export default function Usuarios(): JSX.Element {
   const [alunosOptions, setAlunosOptions] = useState<AlunoOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [turmaFiltro, setTurmaFiltro] = useState<string>('');
   const itemsPerPage = 10;
   const [showForm, setShowForm] = useState(false);
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
@@ -51,20 +53,41 @@ export default function Usuarios(): JSX.Element {
       const alunosList = aSnap.docs.map(d => ({ id: d.id, ...(d.data() as any) }));
       setProfessores(pSnap.docs.map(d => ({ id: d.id, ...(d.data() as any) })));
       setAlunos(alunosList);
-      setAlunosOptions(alunosList.map(a => ({ id: a.id, nome: a.nome })));
       setResponsaveis(rSnap.docs.map(d => ({ id: d.id, ...(d.data() as any) })));
       setAdministradores(admSnap.docs.map(d => ({ id: d.id, ...(d.data() as any) })));
       setTurmas(tSnap.docs.map(d => ({ id: d.id, nome: (d.data() as any).nome })));
       setLoading(false);
+      setAlunosOptions(
+        alunosList
+          .map(a => {
+            const turma = tSnap.docs.find(t => t.id === a.turmaId);
+            return {
+              id: a.id,
+              nome: `${a.nome}${turma ? ` - ${(turma.data() as any).nome}` : ''}`,
+            };
+          })
+          .sort((a, b) => a.nome.localeCompare(b.nome))
+      );
     }
     fetchData();
   }, []);
 
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value);
 
-  const filterList = <T extends UsuarioBase>(list: T[]) =>
-    list.filter(u => (u.nome + u.email).toLowerCase().includes(search.toLowerCase()))
-      .sort((a, b) => a.nome.localeCompare(b.nome));
+  const usuarioLogado = { tipo: 'administradores' }; // Verifica o tipo de usuário logado
+
+  const filterList = <T extends UsuarioBase>(list: T[]) => {
+    let filtered = list.filter(u =>
+      (u.nome + u.email).toLowerCase().includes(search.toLowerCase())
+    );
+
+    if (activeTab === 'alunos' && usuarioLogado.tipo === 'administrador' && turmaFiltro) {
+      filtered = filtered.filter(a => (a as Aluno).turmaId === turmaFiltro);
+    }
+
+    return filtered.sort((a, b) => a.nome.localeCompare(b.nome));
+  };
+
 
   const handleExcluir = async (id: string) => {
     if (!window.confirm('Excluir este usuário?')) return;
@@ -130,7 +153,13 @@ export default function Usuarios(): JSX.Element {
       if (data.tipoUsuario === 'professores') setProfessores(novosDados);
       if (data.tipoUsuario === 'alunos') {
         setAlunos(novosDados);
-        setAlunosOptions(novosDados.map(a => ({ id: a.id, nome: a.nome })));
+        setAlunosOptions(novosDados.map(a => {
+          const turma = turmas.find(t => t.id === a.turmaId);
+          return {
+            id: a.id,
+            nome: `${a.nome}${turma ? ` (${turma.nome})` : ''}`,
+          };
+        }));
       }
       if (data.tipoUsuario === 'responsaveis') setResponsaveis(novosDados);
       if (data.tipoUsuario === 'administradores') setAdministradores(novosDados);
@@ -184,18 +213,55 @@ export default function Usuarios(): JSX.Element {
   return (
     <AppLayout>
       <Container className="my-4">
-        <Row className="justify-content-between align-items-center mb-3">
-          <Col><h3 className="text-primary">Usuários</h3></Col>
-          <Col className="text-end">
-            <Button variant="primary" onClick={() => { setFormMode('add'); setFormDefaults({ tipoUsuario: activeTab }); setShowForm(true); }}>
-              <PlusCircle className="me-2" size={18} /> Novo Usuário
-            </Button>
+        <div className="bg-white border-bottom border-gray-200 mb-4">
+          <div className="container px-4">
+            <div className="d-flex align-items-center justify-content-between py-4">
+              <div className="d-flex align-items-center gap-3">
+                <div className="d-flex align-items-center justify-content-center rounded bg-primary" style={{ width: 48, height: 48 }}>
+                  <Person size={24} color="#fff" />
+                </div>
+                <div>
+                  <h2 className="fs-3 fw-bold text-dark mb-0">Usuários</h2>
+                  <p className="text-muted mb-0" style={{ fontSize: 14 }}>MobClassApp - Portal do Professor</p>
+                </div>
+              </div>
+              <div>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setFormMode('add');
+                    setFormDefaults({ tipoUsuario: activeTab });
+                    setShowForm(true);
+                  }}
+                >
+                  <PlusCircle className="me-2" size={18} /> Novo Usuário
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Row className="mb-3">
+          <Col md={6}>
+            <InputGroup>
+              <FormControl placeholder="Pesquisar..." value={search} onChange={handleSearch} />
+            </InputGroup>
+          </Col>
+          <Col md={6}>
+            <Form.Select
+              value={turmaFiltro}
+              onChange={e => setTurmaFiltro(e.target.value)}
+              disabled={!(activeTab === 'alunos' && usuarioLogado.tipo === 'administradores')}
+            >
+              <option value="">Todas as turmas</option>
+              {[...turmas]
+                .sort((a, b) => a.nome.localeCompare(b.nome))
+                .map(t => (
+                  <option key={t.id} value={t.id}>{t.nome}</option>
+                ))}
+            </Form.Select>
           </Col>
         </Row>
-
-        <InputGroup className="mb-3">
-          <FormControl placeholder="Pesquisar..." value={search} onChange={handleSearch} />
-        </InputGroup>
 
         <Tabs activeKey={activeTab} onSelect={k => { setActiveTab(k as any); setCurrentPage(1); }} className="mb-3">
           <Tab eventKey="professores" title="Professores" />
@@ -218,18 +284,59 @@ export default function Usuarios(): JSX.Element {
                   <th>Ações</th>
                 </tr>
               </thead>
-              <tbody>{renderRows()}</tbody>
+              <tbody>
+                {activeTab === 'alunos' && turmaFiltro
+                  ? filterList(alunos)
+                    .filter(a => a.turmaId === turmaFiltro)
+                    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                    .map(user => (
+                      <tr key={user.id}>
+                        <td>{user.nome}</td>
+                        <td>{user.email}</td>
+                        <td>
+                          <Badge bg={user.status === 'Ativo' ? 'success' : 'secondary'}>
+                            {user.status}
+                          </Badge>
+                        </td>
+                        <td>{turmas.find(t => t.id === user.turmaId)?.nome}</td>
+                        <td>
+                          <Dropdown align="end">
+                            <Dropdown.Toggle variant="light" size="sm">
+                              <i className="bi bi-three-dots-vertical"></i>
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                              <Dropdown.Item onClick={() => openEdit(user)}>
+                                <i className="bi bi-pencil me-2"></i> Editar
+                              </Dropdown.Item>
+                              <Dropdown.Item onClick={() => handleExcluir(user.id)}>
+                                <i className="bi bi-trash me-2"></i> Excluir
+                              </Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </td>
+                      </tr>
+                    ))
+                  : renderRows()}
+              </tbody>
             </Table>
             <Paginacao
-  paginaAtual={currentPage}
-  totalPaginas={Math.ceil(filterList(
-    activeTab === 'professores' ? professores :
-    activeTab === 'alunos' ? alunos :
-    activeTab === 'responsaveis' ? responsaveis :
-    administradores
-  ).length / itemsPerPage)}
-  aoMudarPagina={setCurrentPage}
-/>
+              paginaAtual={currentPage}
+              totalPaginas={Math.ceil(
+                (activeTab === 'alunos' && turmaFiltro
+                  ? filterList(alunos).filter(a => a.turmaId === turmaFiltro)
+                  : filterList(
+                    activeTab === 'professores'
+                      ? professores
+                      : activeTab === 'alunos'
+                        ? alunos
+                        : activeTab === 'responsaveis'
+                          ? responsaveis
+                          : administradores
+                  )
+                ).length / itemsPerPage
+              )}
+              aoMudarPagina={setCurrentPage}
+            />
           </>
         )}
 

@@ -10,6 +10,7 @@ import {
 import { db } from '../services/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import Paginacao from '../components/Paginacao';
+import { Users } from 'lucide-react';
 
 interface Turma {
   id: string;
@@ -136,7 +137,10 @@ export default function Turmas() {
   };
 
   const totalAlunos = (turmaId: string) => alunos.filter(a => a.turmaId === turmaId).length;
-  const turmasFiltradas = turmas.filter(t => !turmaFiltro || t.id === turmaFiltro);
+  const turmasFiltradas = turmas.filter(t => !turmaFiltro || t.nome.startsWith(turmaFiltro));
+
+  // Extrai as séries únicas das turmas (primeira palavra do nome)
+  const seriesUnicas = Array.from(new Set(turmas.map(t => t.nome.split(' ')[0]))).sort();
 
   const inicio = (paginaAtual - 1) * itensPorPagina;
   const turmasPaginadas = turmasFiltradas.slice(inicio, inicio + itensPorPagina);
@@ -145,20 +149,39 @@ export default function Turmas() {
     <AppLayout>
       <Container className="my-4">
         <Row className="justify-content-between align-items-center mb-3">
-          <Col><h3 className="text-primary" style={{ marginBottom: 0 }}>Turmas</h3></Col>
+          <div className="bg-white border-bottom border-gray-200 mb-4">
+            <div className="container px-4">
+              <div className="d-flex align-items-center justify-content-between py-4">
+                <div className="d-flex align-items-center gap-3">
+                  <div
+                    className="d-flex align-items-center justify-content-center rounded bg-primary"
+                    style={{ width: 48, height: 48 }}
+                  >
+                    <Users size={24} color="#fff" />
+                  </div>
+                  <div>
+                    <h2 className="fs-3 fw-bold text-dark mb-0">Turmas</h2>
+                    <p className="text-muted mb-0" style={{ fontSize: 14 }}>
+                      MobClassApp - Portal do Professor
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <Col md={4}>
+            <Form.Select value={turmaFiltro} onChange={e => { setTurmaFiltro(e.target.value); setPaginaAtual(1); }}>
+              <option value="">Filtrar por série</option>
+              {seriesUnicas.map(serie => (
+                <option key={serie} value={serie}>{serie} Ano</option>
+              ))}
+            </Form.Select>
+
+          </Col>
           <Col className="text-end">
             <Button variant="primary" onClick={() => openModal()}>
               <PlusCircle className="me-2" size={18} /> Nova Turma
             </Button>
-          </Col>
-        </Row>
-
-        <Row className="mb-3">
-          <Col md={4}>
-            <Form.Select value={turmaFiltro} onChange={e => { setTurmaFiltro(e.target.value); setPaginaAtual(1); }}>
-              <option value="">Filtrar por turma</option>
-              {turmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
-            </Form.Select>
           </Col>
         </Row>
 
@@ -253,7 +276,6 @@ export default function Turmas() {
     </AppLayout>
   );
 }
-
 
 
 

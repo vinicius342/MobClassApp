@@ -9,6 +9,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { PlusCircle } from 'react-bootstrap-icons';
+import { Notebook } from 'lucide-react';
 
 interface Materia {
   id: string;
@@ -114,12 +115,31 @@ export default function Materias(): JSX.Element {
     <AppLayout>
       <Container className="my-4">
         <Row className="justify-content-between align-items-center mb-3">
-          <Col><h3 className="text-primary">Matérias</h3></Col>
-          <Col className="text-end">
-            <Button variant="primary" onClick={() => openModal()}>
-              <PlusCircle className="me-2" size={18} /> Nova Matéria
-            </Button>
-          </Col>
+          <div className="bg-white border-bottom border-gray-200 mb-4">
+            <div className="container px-4">
+              <div className="d-flex align-items-center justify-content-between py-4">
+                <div className="d-flex align-items-center gap-3">
+                  <div
+                    className="d-flex align-items-center justify-content-center rounded bg-primary"
+                    style={{ width: 48, height: 48 }}
+                  >
+                    <Notebook size={24} color="#fff" />
+                  </div>
+                  <div>
+                    <h2 className="fs-3 fw-bold text-dark mb-0">Matérias</h2>
+                    <p className="text-muted mb-0" style={{ fontSize: 14 }}>
+                      MobClassApp - Portal do Professor
+                    </p>
+                  </div>
+                </div>
+                <Col className="text-end">
+                  <Button variant="primary" onClick={() => openModal()}>
+                    <PlusCircle className="me-2" size={18} /> Nova Matéria
+                  </Button>
+                </Col>
+              </div>
+            </div>
+          </div>
         </Row>
 
         {loading ? (
@@ -206,7 +226,6 @@ export default function Materias(): JSX.Element {
     </AppLayout>
   );
 }
-
 
 
 
