@@ -1,3 +1,4 @@
+// src/components/UsuarioForm.tsx - Vínculo com filhos agora é opcional para responsáveis
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -63,7 +64,7 @@ const schema: yup.ObjectSchema<FormValues> = yup.object({
 
   filhos: yup.array(yup.string().defined()).when('tipoUsuario', {
     is: 'responsaveis',
-    then: a => a.min(1, 'Selecione ao menos 1 aluno'),
+    then: a => a.optional(), // vínculo agora é opcional
     otherwise: a => a.strip()
   }),
 }).required();
@@ -190,7 +191,7 @@ export default function UsuarioForm({
           </Form.Group>
 
           <Form.Group controlId="usuario-filhos" className="mb-3">
-            <Form.Label>Selecione os alunos</Form.Label>
+            <Form.Label>Selecione os alunos (opcional)</Form.Label>
             <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid #ccc', padding: '10px' }}>
               {alunosFiltrados.map(aluno => (
                 <Form.Check

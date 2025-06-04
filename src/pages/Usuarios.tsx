@@ -1,4 +1,4 @@
-// src/pages/Usuarios.tsx - Completo com coluna de ações modernizada (Dropdown)
+// src/pages/Usuarios.tsx - Atualizado com suporte ao modoAcesso "responsavel"
 import { useEffect, useState, ChangeEvent, JSX } from 'react';
 import AppLayout from '../components/AppLayout';
 import {
@@ -16,7 +16,7 @@ import UsuarioForm, { FormValues, AlunoOption } from '../components/UsuarioForm'
 interface UsuarioBase { id: string; nome: string; email: string; status: 'Ativo' | 'Inativo'; }
 interface Professor extends UsuarioBase { turmas: string[]; }
 interface Turma { id: string; nome: string; }
-interface Aluno extends UsuarioBase { turmaId?: string; responsavelId?: string; }
+interface Aluno extends UsuarioBase { turmaId?: string; responsavelId?: string; modoAcesso?: string; }
 interface Responsavel extends UsuarioBase { filhos?: string[]; }
 interface Administrador extends UsuarioBase { }
 
@@ -74,7 +74,7 @@ export default function Usuarios(): JSX.Element {
 
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value);
 
-  const usuarioLogado = { tipo: 'administradores' }; // Verifica o tipo de usuário logado
+  const usuarioLogado = { tipo: 'administradores' };
 
   const filterList = <T extends UsuarioBase>(list: T[]) => {
     let filtered = list.filter(u =>
@@ -87,7 +87,6 @@ export default function Usuarios(): JSX.Element {
 
     return filtered.sort((a, b) => a.nome.localeCompare(b.nome));
   };
-
 
   const handleExcluir = async (id: string) => {
     if (!window.confirm('Excluir este usuário?')) return;
@@ -142,10 +141,18 @@ export default function Usuarios(): JSX.Element {
           }),
         });
 
-        if (!response.ok) throw new Error("Erro ao criar usuário");
+        const result = await response.json();
+
+        if (!response.ok) throw new Error(result.message || "Erro ao criar usuário");
+
+        let mensagem = "Usuário salvo com sucesso!";
+        if (data.tipoUsuario === "alunos" && result.modoAcesso === "responsavel") {
+          mensagem = "Aluno cadastrado sem login. O acesso será feito pelo responsável.";
+        }
+
+        setToast({ show: true, message: mensagem, variant: 'success' });
       }
 
-      setToast({ show: true, message: 'Usuário salvo com sucesso!', variant: 'success' });
       setShowForm(false);
 
       const snapshot = await getDocs(collection(db, data.tipoUsuario));
@@ -163,9 +170,9 @@ export default function Usuarios(): JSX.Element {
       }
       if (data.tipoUsuario === 'responsaveis') setResponsaveis(novosDados);
       if (data.tipoUsuario === 'administradores') setAdministradores(novosDados);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setToast({ show: true, message: 'Erro ao salvar usuário.', variant: 'danger' });
+      setToast({ show: true, message: error.message || 'Erro ao salvar usuário.', variant: 'danger' });
     }
   };
 
@@ -185,7 +192,11 @@ export default function Usuarios(): JSX.Element {
       <tr key={user.id}>
         <td>{user.nome}</td>
         <td>{user.email}</td>
-        <td><Badge bg={user.status === 'Ativo' ? 'success' : 'secondary'}>{user.status}</Badge></td>
+        <td>
+          <Badge bg={user.status === 'Ativo' ? 'success' : 'secondary'}>
+            {user.status}
+          </Badge>
+        </td>
         <td>
           {activeTab === 'professores' && (user as Professor).turmas.map(id => turmas.find(t => t.id === id)?.nome || id).join(', ')}
           {activeTab === 'alunos' && turmas.find(t => t.id === (user as Aluno).turmaId)?.nome}
