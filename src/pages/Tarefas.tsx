@@ -17,14 +17,12 @@ import Paginacao from '../components/Paginacao';
 import { GraduationCap, Plus, Eye, Pencil, Trash2, ArrowLeft } from "lucide-react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faX, faCircleExclamation, faCheck, faComment } from '@fortawesome/free-solid-svg-icons';
-
 //PDF
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 // XLSX
 import * as XLSX from 'xlsx';
-import React from 'react';
 
 interface Entrega {
   id: string;
@@ -79,10 +77,9 @@ export default function Tarefas() {
   const [materias, setMaterias] = useState<Materia[]>([]);
   const [vinculos, setVinculos] = useState<Vinculo[]>([]);
 
-  const [busca, setBusca] = useState('');
   const [filtroTurma, setFiltroTurma] = useState('');
   const [filtroMateria, setFiltroMateria] = useState('');
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [alunos, setAlunos] = useState<Aluno[]>([]);
 
 
@@ -196,7 +193,7 @@ export default function Tarefas() {
 };
 
   const fetchData = async () => {
-    setLoading(true);
+    // setLoading(true);
 
     let turmaDocs = [];
     if (isAdmin) {
@@ -204,7 +201,7 @@ export default function Tarefas() {
     } else {
       let vincSnap;
       if (!userData) {
-        setLoading(false);
+        // setLoading(false);
         return;
       }
       vincSnap = await getDocs(query(collection(db, 'professores_materias'), where('professorId', '==', userData.uid)));
@@ -249,7 +246,7 @@ export default function Tarefas() {
 
     setTurmas(turmaDocs.map(d => ({ id: d.id, nome: d.data()?.nome || '-' })));
     setTarefas(tarefasFiltradas.map(d => ({ id: d.id, ...(d.data() as any) })));
-    setLoading(false);
+    // setLoading(false);
     const alunosSnap = await getDocs(collection(db, 'alunos'));
     setAlunos(alunosSnap.docs.map(doc => {
       const data = doc.data() as Omit<Aluno, 'id'>;
@@ -356,9 +353,9 @@ export default function Tarefas() {
     fetchData();
   };
 
-  const [showObsModal, setShowObsModal] = React.useState(false);
-  const [currentObs, setCurrentObs] = React.useState(''); // texto da observação que está editando
-  const [editingId, setEditingId] = React.useState<string | null>(null); // id da linha que está editando
+  const [showObsModal, setShowObsModal] = useState(false);
+  const [currentObs, setCurrentObs] = useState(''); // texto da observação que está editando
+  const [editingId, setEditingId] = useState<string | null>(null); // id da linha que está editando
 
 
   const openObsModal = (id: string, obs: string) => {

@@ -234,7 +234,7 @@ export default function Notas(): JSX.Element {
               </div>
             </div>
           </div>
-        </div>;
+        </div>
         <Tabs activeKey={abaAtiva} onSelect={(k) => setAbaAtiva(k as any)} className="mb-3">
           {/* ...aba Lançamento permanece igual... */}
           <Tab eventKey="lancamento" title="Lançamento de Notas">

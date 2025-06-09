@@ -206,8 +206,7 @@ export default function Agenda(): JSX.Element {
               </div>
             </div>
           </div>
-        </div>;
-
+        </div>
 
         <Tabs activeKey={tab} onSelect={(k) => setTab(k as any)} className="mb-3">
           {isAdmin && (

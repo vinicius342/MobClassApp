@@ -202,7 +202,7 @@ export default function Frequencia(): JSX.Element {
                   </div>
                 </div>
               </div>
-          </div>;
+          </div>
           <Col xs={12} md={8} className="d-flex gap-2">
             <Form.Select
               value={turmaId}
