@@ -149,9 +149,14 @@ export default function UsuarioForm({
           <Form.Label htmlFor="usuario-turma">Turma</Form.Label>
           <Form.Select isInvalid={!!errors.turmaId} {...register('turmaId')}>
             <option value="">Selecione uma turma</option>
-            {turmas.map(t => (
-              <option key={t.id} value={t.id}>{t.nome}</option>
-            ))}
+            {turmas
+              .slice() // cria uma cópia para não alterar o original
+              .sort((a, b) => a.nome.localeCompare(b.nome))
+              .map(t => (
+                <option key={t.id} value={t.id}>
+                  {t.nome}
+                </option>
+              ))}
           </Form.Select>
           <Form.Control.Feedback type="invalid">
             {errors.turmaId?.message}
@@ -162,16 +167,19 @@ export default function UsuarioForm({
       {tipo === 'professores' && (
         <Form.Group controlId="usuario-turmas" className="mb-3">
           <Form.Label>Turmas</Form.Label>
-          {turmas.map(t => (
-            <Form.Check
-              key={t.id}
-              type="checkbox"
-              id={`turma-${t.id}`}
-              label={t.nome}
-              value={t.id}
-              {...register('turmas')}
-            />
-          ))}
+          {turmas
+            .slice()
+            .sort((a, b) => a.nome.localeCompare(b.nome))
+            .map(t => (
+              <Form.Check
+                key={t.id}
+                type="checkbox"
+                id={`turma-${t.id}`}
+                label={t.nome}
+                value={t.id}
+                {...register('turmas')}
+              />
+            ))}
           <Form.Control.Feedback type="invalid">
             {errors.turmas?.message as string}
           </Form.Control.Feedback>
