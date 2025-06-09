@@ -4,6 +4,7 @@ import AppLayout from '../components/AppLayout';
 import {
   Container, Table, Button, Modal, Form, Tabs, Tab, Row, Col, Dropdown,
 } from 'react-bootstrap';
+import { Calendar } from "lucide-react";
 import {
   collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, getDoc
 } from 'firebase/firestore';
@@ -184,7 +185,28 @@ export default function Agenda(): JSX.Element {
   return (
     <AppLayout>
       <Container className="my-4">
-        <h3 className="text-primary mb-3">Agenda de Aulas</h3>
+
+
+        <div className="bg-white border-bottom border-gray-200">
+          <div className="container px-4">
+            <div className="d-flex align-items-center justify-content-between py-4">
+              <div className="d-flex align-items-center gap-3">
+                <div
+                  className="d-flex align-items-center justify-content-center rounded bg-primary"
+                  style={{ width: 48, height: 48 }}
+                >
+                  <Calendar size={24} color="#fff" />
+                </div>
+                <div>
+                  <h2 className="fs-3 fw-bold text-dark mb-0">Agenda de Aulas</h2>
+                  <p className="text-muted mb-0" style={{ fontSize: 14 }}>
+                    MobClassApp - Portal do Professor
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <Tabs activeKey={tab} onSelect={(k) => setTab(k as any)} className="mb-3">
           {isAdmin && (
@@ -336,6 +358,7 @@ export default function Agenda(): JSX.Element {
     </AppLayout>
   );
 }
+
 
 
 

@@ -8,6 +8,7 @@ import {
   collection, getDocs, query, where,
   writeBatch, doc, getDoc
 } from 'firebase/firestore';
+import { CheckSquare } from "lucide-react";
 import { db } from '../services/firebase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -182,9 +183,26 @@ export default function Frequencia(): JSX.Element {
     <AppLayout>
       <Container className="my-4">
         <Row className="mb-3 align-items-center">
-          <Col xs={12} md={4}>
-            <h3 className="text-primary">Lançar Frequência</h3>
-          </Col>
+          <div className="bg-white border-bottom border-gray-200 mb-4">
+              <div className="container px-4">
+                <div className="d-flex align-items-center justify-content-between py-4">
+                  <div className="d-flex align-items-center gap-3">
+                    <div
+                      className="d-flex align-items-center justify-content-center rounded bg-primary"
+                      style={{ width: 48, height: 48 }}
+                    >
+                      <CheckSquare size={24} color="#fff" />
+                    </div>
+                    <div>
+                      <h2 className="fs-3 fw-bold text-dark mb-0">Lançar Frequência</h2>
+                      <p className="text-muted mb-0" style={{ fontSize: 14 }}>
+                        MobClassApp - Portal do Professor
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
           <Col xs={12} md={8} className="d-flex gap-2">
             <Form.Select
               value={turmaId}
@@ -208,22 +226,22 @@ export default function Frequencia(): JSX.Element {
               <option value="">Selecione a Matéria</option>
               {isAdmin
                 ? materias
-                    .filter(m => m && m.nome)
-                    .map(m => (
-                      <option key={m.id} value={m.id}>
-                        {m.nome}
-                      </option>
-                    ))
+                  .filter(m => m && m.nome)
+                  .map(m => (
+                    <option key={m.id} value={m.id}>
+                      {m.nome}
+                    </option>
+                  ))
                 : vinculos
-                    .filter(v => v.turmaId === turmaId)
-                    .map(v => {
-                      const materia = materias.find(m => m.id === v.materiaId);
-                      return materia ? (
-                        <option key={materia.id} value={materia.id}>
-                          {materia.nome}
-                        </option>
-                      ) : null;
-                    })}
+                  .filter(v => v.turmaId === turmaId)
+                  .map(v => {
+                    const materia = materias.find(m => m.id === v.materiaId);
+                    return materia ? (
+                      <option key={materia.id} value={materia.id}>
+                        {materia.nome}
+                      </option>
+                    ) : null;
+                  })}
             </Form.Select>
             <Form.Control
               id="data-aula"
@@ -340,7 +358,6 @@ export default function Frequencia(): JSX.Element {
     </AppLayout>
   );
 }
-
 
 
 
