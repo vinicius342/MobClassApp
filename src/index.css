@@ -5,9 +5,10 @@
   padding: 0;
 }
 
-html, body {
+html,
+body {
   height: 100%;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f8f9fa;
   color: #212529;
   -webkit-font-smoothing: antialiased;
@@ -27,7 +28,8 @@ html, body {
     margin-left: 0 !important;
     max-width: 100% !important;
     padding: 1rem !important;
-    margin-top: 70px !important; /* compensação da navbar fixa no mobile */
+    margin-top: 70px !important;
+    /* compensação da navbar fixa no mobile */
   }
 }
 
@@ -41,6 +43,7 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
 a:hover {
   text-decoration: underline;
 }
@@ -48,7 +51,7 @@ a:hover {
 /* Navbar Desktop e Offcanvas Mobile */
 .navbar,
 .offcanvas {
-  background-color: #021E4C !important;
+  background-color: #021e4c !important;
 }
 
 /* Navbar Brand e Offcanvas Title */
@@ -65,17 +68,22 @@ a:hover {
   padding: 0.75rem 1rem;
   transition: background-color 0.2s, padding-left 0.2s;
 }
+
 .nav-link:hover {
   background-color: rgba(255, 255, 255, 0.1);
   padding-left: 1.5rem;
 }
 
 /* Inputs e botões */
-input, button, textarea, select {
+input,
+button,
+textarea,
+select {
   outline: none;
   box-shadow: none;
   font-family: inherit;
 }
+
 button {
   cursor: pointer;
 }
@@ -89,6 +97,7 @@ button {
   margin-bottom: 1.5rem;
   transition: box-shadow 0.3s ease;
 }
+
 .dashboard-card:hover,
 .card:hover {
   box-shadow: 0 0 18px rgba(0, 0, 0, 0.1);
@@ -103,9 +112,10 @@ button {
 
 /* Botões primários */
 .btn-primary {
-  background-color: #021E4C;
-  border-color: #021E4C;
+  background-color: #021e4c;
+  border-color: #021e4c;
 }
+
 .btn-primary:hover {
   background-color: #003f8a;
   border-color: #003f8a;
@@ -113,28 +123,32 @@ button {
 
 /* Botões outline */
 .btn-outline-primary {
-  color: #021E4C;
-  border-color: #021E4C;
+  color: #021e4c;
+  border-color: #021e4c;
 }
+
 .btn-outline-primary:hover {
-  background-color: #021E4C;
+  background-color: #021e4c;
   color: #fff;
-  border-color: #021E4C;
+  border-color: #021e4c;
 }
 
 /* Estilo do Offcanvas */
 .offcanvas,
 .offcanvas-header,
 .offcanvas-body {
-  background-color: #021E4C !important;
+  background-color: #021e4c !important;
 }
+
 .offcanvas .nav-link {
   font-size: 1.2rem;
   color: #fff;
 }
+
 .offcanvas .nav-link:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
+
 .offcanvas {
   width: 250px;
 }
@@ -147,12 +161,14 @@ button {
   margin-right: 5px;
   border-radius: 0.25rem 0.25rem 0 0;
 }
+
 .nav-tabs .nav-link:hover {
   background-color: #d4d8db;
 }
+
 .nav-tabs .nav-link.active {
   background-color: #ffffff;
-  color: #021E4C;
+  color: #021e4c;
   border-color: #dee2e6 #dee2e6 #ffffff;
 }
 
@@ -178,7 +194,7 @@ button {
 }
 
 .agenda-table thead th {
-  background-color: #021E4C;
+  background-color: #021e4c;
   color: #fff;
   text-align: center;
   padding: 0.75rem;
@@ -204,7 +220,7 @@ button {
 .agenda-entry strong {
   display: inline-block;
   min-width: 100px;
-  color: #021E4C;
+  color: #021e4c;
 }
 
 /* Estilos para a página de Frequência */
@@ -248,25 +264,28 @@ button {
   border-color: #6c757d !important;
   transition: all 0.1s ease-in-out;
 }
+
 .justifyificada-button svg {
   color: #6c757d !important;
   transition: color 0.1s ease-in-out;
 }
+
 .justifyificada-button:hover,
 .justifyificada-button.selected {
   background-color: #6c757d !important;
   color: white !important;
 }
+
 .justifyificada-button:hover svg,
 .justifyificada-button.selected svg {
   color: white !important;
 }
 
-
 /* Data frequencia */
 .custom-calendar-small {
   font-size: 1.5rem;
-  min-width: 100%; /* ocupa toda a largura do popper */
+  min-width: 100%;
+  /* ocupa toda a largura do popper */
 }
 
 .react-datepicker__day,
@@ -292,10 +311,47 @@ button {
   width: 100% !important;
 }
 
+@media (max-width: 450px) {
+  .container {
+    padding: 0;
+  }
 
+  .row {
+    gap: 0.5rem;
+  }
+  
+  .d-flex.gap-3.justify-content-end.col-md-7 {
+    display: flex;
+    flex-direction: column;
+  }
 
+  .d-flex.justify-content-end.gap-3.col-md-12 > button {
+    display: none !important;
+  }
 
+  .aluno-nome-frequencia {
+    font-size: medium;
+  }
 
+  div .user-icon-circle-frequencia {
+    display: none;
+  }
 
+  .nothing-in-mobile {
+    display: none !important;
+  }
+}
 
+@media (max-width: 770px) {
+  .button-group-card-frequencia {
+    flex-direction: column;
+  }
 
+  .info-cards-frequencia {
+    gap: 0 !important;
+  }
+
+  .row {
+    gap: 0.5rem;
+  }
+}
