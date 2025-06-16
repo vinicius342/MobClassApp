@@ -311,6 +311,19 @@ button {
   width: 100% !important;
 }
 
+/* Notas */
+.thead-sticky th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 2px -1px rgba(0,0,0,0.04);
+}
+
+.campo-alterado {
+  background-color: #bbe9c6 !important; /* amarelo claro, ajuste como quiser */
+  transition: background 0.2s;
+}
+
 @media (max-width: 450px) {
   .container {
     padding: 0;
