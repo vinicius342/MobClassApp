@@ -356,6 +356,10 @@ button {
 }
 
 @media (max-width: 770px) {
+  .nothing-in-mobile {
+    display: none !important;
+  }
+
   .button-group-card-frequencia {
     flex-direction: column;
   }
@@ -366,5 +370,590 @@ button {
 
   .row {
     gap: 0.5rem;
+  }
+
+  .columns-input-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mb-custom-mobile-1 {
+    margin-bottom: 10px !important;
+  }
+
+  .mb-custom-mobile-0 {
+    margin-bottom: 0 !important;
+  }
+}
+
+/* ========== ESTILOS PARA AGENDA - MOBILE ========== */
+@media (max-width: 768px) {
+  /* Ocultar tabela tradicional no mobile */
+  .agenda-table-desktop {
+    display: none !important;
+  }
+
+  /* Estilo de cards para mobile */
+  .agenda-mobile-cards {
+    display: block !important;
+  }
+
+  /* === ESTILOS PARA CARDS DE TURNO (Grade por Turnos) - APENAS MOBILE === */
+  .turno-cards-container {
+    padding: 0.5rem;
+  }
+
+  .turno-card-header {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .turno-card-header h4 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Container dos dias em mobile */
+  .turno-dias-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Cards de dia da semana em mobile */
+  .turno-dia-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    cursor: pointer; /* Torna o card clicável no mobile */
+    transition: all 0.3s ease;
+  }
+
+  .turno-dia-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .turno-dia-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0; /* Removido margin quando colapsado */
+    padding-bottom: 0; /* Removido padding quando colapsado */
+    border-bottom: none; /* Removido border quando colapsado */
+    transition: all 0.3s ease;
+  }
+
+  /* Quando expandido, adiciona espaçamento */
+  .turno-dia-card.expanded .turno-dia-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f1f3f4;
+  }
+
+  .turno-dia-titulo {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #212529;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .turno-dia-titulo:hover {
+    color: #021e4c;
+  }
+
+  /* Indicador visual para dias com aulas - APENAS MOBILE quando recolhido */
+  .turno-dia-card:not(.expanded) .turno-dia-titulo::after {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background-color: #007bff;
+    border-radius: 50%;
+    margin-left: 8px;
+    opacity: 0.8;
+    animation: pulse 2s infinite;
+  }
+
+  /* Esconde o indicador se não há aulas - APENAS MOBILE */
+  .turno-dia-card.no-classes:not(.expanded) .turno-dia-titulo::after {
+    display: none;
+  }
+
+  /* Animação do indicador - APENAS MOBILE */
+  @keyframes pulse {
+    0% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.7;
+    }
+  }
+
+  .turno-dia-toggle {
+    background: transparent !important;
+    border: none !important;
+    padding: 0.5rem !important;
+    color: #6c757d !important;
+    font-size: 1rem !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .turno-dia-toggle:hover {
+    color: #495057 !important;
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    border-radius: 6px !important;
+  }
+
+  /* Aulas dentro do dia - inicialmente ocultas APENAS NO MOBILE */
+  .turno-aulas-lista {
+    display: none; /* Oculto por padrão no mobile */
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    animation: slideDown 0.3s ease-out;
+  }
+
+  /* Quando expandido, mostra as aulas - APENAS MOBILE */
+  .turno-dia-card.expanded .turno-aulas-lista {
+    display: flex;
+  }
+
+  /* Animação de slide down - APENAS MOBILE */
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .turno-aula-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.875rem;
+    transition: all 0.2s ease;
+  }
+
+  .turno-aula-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .turno-aula-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+
+  .turno-aula-horario {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #212529;
+  }
+
+  .turno-aula-actions {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .turno-aula-btn {
+    padding: 0.375rem !important;
+    border: none !important;
+    background: transparent !important;
+    border-radius: 6px !important;
+    font-size: 0.875rem !important;
+    line-height: 1 !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .turno-aula-btn.edit {
+    color: #0d6efd !important;
+  }
+
+  .turno-aula-btn.delete {
+    color: #dc3545 !important;
+  }
+
+  .turno-aula-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    transform: scale(1.1);
+  }
+
+  .turno-aula-body {
+    margin-bottom: 0.75rem;
+  }
+
+  .turno-aula-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .turno-aula-materia {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #212529;
+  }
+
+  .turno-aula-professor {
+    font-size: 0.85rem;
+    color: #6c757d;
+  }
+
+  .turno-aula-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .turno-aula-badge {
+    background: #e3f2fd;
+    color: #1565c0;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .turno-aula-badge.manha {
+    background: #fff3e0;
+    color: #ef6c00;
+  }
+
+  .turno-aula-badge.tarde {
+    background: #ffebee;
+    color: #c62828;
+  }
+
+  .turno-aula-badge.noite {
+    background: #e8f5e8;
+    color: #2e7d32;
+  }
+
+  /* Card de adicionar aula em mobile */
+  .turno-add-card {
+    border: 2px dashed #d1d5db !important;
+    background: #f9fafb !important;
+    padding: 1.5rem !important;
+    text-align: center !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+  }
+
+  .turno-add-card:hover {
+    border-color: #60a5fa !important;
+    background: #eff6ff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .turno-add-text {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  .turno-add-icon {
+    color: #9ca3af;
+    font-size: 1.25rem;
+    transition: color 0.2s ease;
+  }
+
+  .turno-add-card:hover .turno-add-icon {
+    color: #2563eb;
+  }
+
+  /* Ajustes para estados vazios em turno */
+  .turno-empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #6c757d;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+  }
+
+  .turno-empty-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+    opacity: 0.6;
+  }
+
+  .turno-empty-title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #495057;
+    font-weight: 600;
+  }
+
+  .turno-empty-text {
+    font-size: 0.875rem;
+    margin: 0;
+  }
+
+  /* === ESTILOS PARA LISTA DE AULAS (Cards Mobile) === */
+  .agenda-card-mobile {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+  }
+
+  .agenda-card-mobile:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .agenda-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f1f3f4;
+  }
+
+  .agenda-card-turno {
+    display: inline-block;
+    background: #e3f2fd;
+    color: #1565c0;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .agenda-card-turno.manha {
+    background: #fff3e0;
+    color: #ef6c00;
+  }
+
+  .agenda-card-turno.tarde {
+    background: #ffebee;
+    color: #c62828;
+  }
+
+  .agenda-card-turno.noite {
+    background: #e8f5e8;
+    color: #2e7d32;
+  }
+
+  .agenda-card-body {
+    margin-bottom: 0.75rem;
+  }
+
+  .agenda-card-row {
+    display: flex;
+    margin-bottom: 0.5rem;
+    align-items: center;
+  }
+
+  .agenda-card-label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.85rem;
+    min-width: 80px;
+    margin-right: 0.75rem;
+  }
+
+  .agenda-card-value {
+    color: #212529;
+    font-size: 0.9rem;
+    flex: 1;
+  }
+
+  .agenda-card-value.highlight {
+    font-weight: 600;
+    color: #021e4c;
+  }
+
+  .agenda-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f1f3f4;
+  }
+
+  .agenda-card-turma-badge {
+    background: #f8f9fa;
+    color: #495057;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid #dee2e6;
+  }
+
+  .agenda-card-actions {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .agenda-card-actions .dropdown-toggle {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0.5rem !important;
+    font-size: 1.2rem !important;
+    color: #6c757d !important;
+  }
+
+  .agenda-card-actions .dropdown-toggle:hover {
+    color: #495057 !important;
+    background-color: #f8f9fa !important;
+    border-radius: 6px;
+  }
+
+  /* Ordenação mobile */
+  .agenda-header-mobile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .agenda-header-mobile h3 {
+    font-size: 1.25rem;
+    margin: 0;
+    color: #212529;
+  }
+
+  .agenda-sort-mobile .dropdown-toggle {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    border-radius: 8px;
+  }
+
+  /* Cards responsivos */
+  .agenda-mobile-cards .agenda-card-mobile {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Ajustes para paginação mobile */
+  .agenda-pagination-mobile {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Estilos para estados vazios */
+  .agenda-empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+  }
+
+  .agenda-empty-state .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .agenda-empty-state h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #495057;
+  }
+
+  .agenda-empty-state p {
+    font-size: 0.9rem;
+    margin: 0;
+  }
+}
+
+/* Estilos para desktop - garantir que cards mobile não apareçam e comportamento original */
+@media (min-width: 769px) {
+  .agenda-mobile-cards {
+    display: none !important;
+  }
+
+  .agenda-table-desktop {
+    display: table !important;
+  }
+
+  /* No desktop, remove estilos específicos de mobile dos cards de turno */
+  .turno-dia-card .turno-dia-titulo::after {
+    display: none !important; /* Remove indicador no desktop */
+  }
+
+  /* Remove cursor pointer dos cards de dia no desktop */
+  .turno-dia-card {
+    cursor: default !important;
+  }
+
+  .turno-dia-card:hover {
+    box-shadow: none !important;
+  }
+
+  /* No desktop, garante que as aulas sempre sejam visíveis */
+  .turno-aulas-lista {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  /* Remove animações específicas do mobile no desktop */
+  .turno-dia-card .turno-aulas-lista {
+    animation: none !important;
+  }
+
+  /* Garante que os cards da lista de aulas não apareçam no desktop */
+  .agenda-card-mobile {
+    display: none !important;
+  }
+}
+
+/* Ajustes adicionais para tablets em orientação portrait */
+@media (max-width: 768px) and (orientation: portrait) {
+  .agenda-card-mobile {
+    padding: 0.875rem;
+  }
+
+  .agenda-card-row {
+    margin-bottom: 0.625rem;
+  }
+
+  .agenda-card-label {
+    min-width: 75px;
+    font-size: 0.8rem;
+  }
+
+  .agenda-card-value {
+    font-size: 0.875rem;
   }
 }
